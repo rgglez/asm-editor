@@ -1,0 +1,281 @@
+;        LIBRERIA DE MACROS 1 DE ENSAMBLADOR (MACROS1.LIB)
+;        Realizada por: GONZALEZ GONZALEZ RODOLFO.
+;        18:55:10  1/17/1994
+
+;----------------------------* MACROS *---------------------------------------
+                    ;MACROS PARA MANEJO DE CRT Y TECLADO
+
+SalvaRegs MACRO               ;este macro salva en la pila registros del
+     PUSH AX                    ;procesador
+     PUSH BX
+     PUSH CX
+     PUSH DX
+     PUSH SI
+     PUSH DI
+     PUSHF
+ENDM
+
+RestauraRegs MACRO            ;este macro recupera los registros empilados
+     POPF                      ;antes por SALVAREGS (AX,BX,CX,DX,FLAGS)
+     POP DI
+     POP SI
+     POP DX
+     POP CX
+     POP BX
+     POP AX
+ENDM
+
+LimpiaRegs MACRO              ;este macro limpia los registros de proposito
+     XOR AX,AX                  ;general de 80x86
+     XOR BX,BX
+     XOR CX,CX
+     XOR DX,DX
+ENDM
+
+WriteLn MACRO Cad             ;este macro escribe una cadena en CRT
+                               ;y hace un retorno de carro y avance de linea
+     LEA DX,Cad                 ;carga direccion del mensaje
+     MOV AH,9                   ;servicio 9, escritura
+     INT 21h                    ;llama a int. 21h
+     MOV AH,2                   ;funcion de escritura de caracteres
+     MOV DL,0Dh                 ;retorno de carro
+     INT 21h                    ;int. 21h
+     MOV AH,2                   ;funcion de escritura de caracteres
+     MOV DL,0Ah                 ;avance de linea
+     INT 21h                    ;int. 21h
+ENDM                          ;fin del macro
+
+Write MACRO Cad               ;este macro ecribe una cadena a CRT sin CR/LF
+     LEA DX,Cad                 ;carga direccion del mensaje
+     MOV AH,9                   ;servicio 9, escritura
+     INT 21h                    ;llama a int. 21h
+ENDM                          ;fin del macro
+
+WriteChar MACRO Char          ;este macro escribe un caracter en CRT
+     MOV AH,2                   ;funcion 2 de escritura de caracteres
+     MOV DL,Char                ;caracter en DL
+     INT 21h                    ;int. 21h
+ENDM                          ;fin del macro
+
+ReadStr MACRO BufTk,BufLen,BufDat      ;este macro lee una cadena en un buffer
+                                       ;desde el teclado
+    LEA DX,BufTk               ;carga direccion del buffer
+    MOV AH,10                  ;funcion 0Ah de lectura de cadenas
+    INT 21h                    ;int. 21h
+    ;                           eliminar retorno de carro
+    MOV BH,0                   ;limpiar BH
+    MOV BL,BufLen              ;carga longitud de la cadena leida
+    MOV SI,BX                  ;almacena longitud en SI
+    LEA BX,BufDat              ;carga en BX la direccion de la cadena leida
+    MOV AH,00                  ;carga caracter nulo en AH
+    MOV BYTE PTR [BX+SI],AH    ;reemplaza 0Dh por 00h
+ENDM                          ;fin del macro
+
+LimpiaBuffer MACRO BufLen,BufDat    ;este macro limpia el area de datos del
+      LOCAL Limpiar                  ;buffer
+      XOR CX,CX                      ;limpiar CX
+      MOV CL,BufLen                  ;en CL la long. maxima del buffer
+      LEA DI,BufDat                  ;en DI la direccion del buffer
+   Limpiar:
+      MOV BYTE PTR [DI],Espacio      ;limpiar cada byte del buffer
+      INC DI
+      LOOP Limpiar
+ENDM
+
+ReadChar MACRO Tecla          ;este macro lee un caracter con eco en CRT
+                                ;desde el teclado
+     MOV AH,1                   ;funcion 1 de lectura de caracteres
+     INT 21h                    ;int. 21h
+     MOV Tecla,AL               ;transferir a parametro
+ENDM                          ;fin del macro
+
+ReadKey MACRO Tecla           ;este macro lee un caracter sin hacer eco en CRT
+     MOV AH,7                   ;funcion 7 de lectura de caracteres sin eco
+     INT 21h                    ;int. 21h
+     MOV Tecla,AL               ;transferir a parametro
+ENDM                          ;fin del macro
+
+Pause MACRO Press             ;este macro hace una pausa hasta que se presiona
+                               ;una tecla
+      GotoXY 45,20             ;coloca cursor
+      Write Press              ;escribe mensaje
+      MOV  AH,0                ;llama al servicio para pausa
+      INT  16h                 ;llama a la int. 16h
+ENDM                          ;fin del macro
+
+GotoXY MACRO X,Y              ;este macro posiciona el cursor en las coorde-
+                              ;nadas (X,Y) de la pantalla
+     MOV  AH,02                 ;servicio de colocacion del cursor
+     MOV  BH,00                 ;pantalla #0
+     MOV  DH,Y                  ;linea   Y
+     MOV  DL,X                  ;columna X
+     INT  10h                   ;llamada a int. 10h
+ENDM                          ;fin del macro
+
+ClrScr MACRO                  ;este macro limpia la pantalla y coloca el
+                                  ;cursor en la esquina superior izquierda
+     MOV AX,0600H                 ;AH=6 scroll, AL=00 d toda la pantalla
+     MOV CX,0000                  ;esquina superior izquierda
+     MOV DX,184FH                 ;esquina inferior derecha
+     MOV BH,07                    ;atributo normal, blanco y negro
+     INT 10h                      ;llamada a int. 10h
+     GotoXY 1,1                   ;superior izquierda
+ENDM                            ;fin del macro
+
+Marco MACRO X1,Y1,X2,Y2         ;programa para escribir un marco en CRT
+      LOCAL Horizontal1,Vertical1,Horizontal2,Vertical2,Sigue
+      MOV CL,X1
+    Horizontal1:                  ;linea horizontal superior
+      GotoXY CL,Y1
+      WriteChar Horiz
+      INC CL
+      CMP CL,X2
+      JBE Horizontal1
+      MOV CL,X1
+    Horizontal2:                  ;linea horizontal inferior
+      GotoXY CL,Y2
+      WriteChar Horiz
+      INC CL
+      CMP CL,X2
+      JBE Horizontal2
+      MOV CL,Y1
+    Vertical1:                    ;linea vertical izquierda
+      GotoXY X1,CL
+      WriteChar Vert
+      INC CL
+      CMP CL,Y2
+      JB Vertical1
+      MOV CL,Y1
+   Vertical2:                    ;linea vertical derecha
+      GotoXY X2,CL
+      WriteChar Vert
+      INC CL
+      CMP CL,Y2
+      JB Vertical2                ;compara para ver si es
+      XOR CX,CX
+      MOV CL,Y2
+      MOV CH,Y1
+      CMP CL,24                   ;un marco de pantalla completa
+      JB  Sigue                   ;si no, sigue adelante
+          DEC CL                   ;si lo es, decrementa ordenadas
+          DEC CH
+    Sigue:                        ;esquineros
+      GotoXY X1,CH
+      WriteChar SupIzq
+      GotoXY X2,CH
+      WriteChar SupDer
+      GotoXY X1,CL
+      WriteChar InfIzq
+      GotoXY X2,CL
+      WriteChar InfDer
+ENDM                            ;fin del macro
+
+WriteCAttr MACRO X,Y,Char,Atrib,Rep,PagNum
+;
+;este macro escribe un caracter CHAR en X,Y con el atributo ATRIB especificado
+;y las veces REP indicadas, usando la pagina de video PAGNUM especificada
+;
+      GotoXY X,Y            ;colocar cursor
+      MOV AH,09             ;funcion 09 de escritura de car. y atrib en X,Y
+      MOV AL,Char           ;en AL el caracter a escribir
+      MOV BH,PagNum         ;numero de pagina de video
+      MOV BL,Atrib          ;atributo del caracter
+      MOV CX,Rep            ;numero de veces
+      INT 10h               ;int. 10h
+ENDM                      ;fin del macro
+
+Return MACRO            ;este macro hace un retorno de carro y avance de linea
+     MOV  AH,2                 ;escribir CR
+     MOV  DL,0Dh
+     INT  21h
+     MOV  AH,2                 ;escribir LF
+     MOV  DL,0Ah
+     INT  21h
+ENDM
+
+HexAscii MACRO         ;este macro convierte los hex. de COL y REN a Ascii
+     LOCAL Sig1,Sig2    ;simbolos locales
+     XOR CX,CX          ;limpiar CX
+     MOV CL,04          ;contador de corrimiento
+     MOV DH,DL          ;copiar DL a DH para respaldarlo
+     SHR DL,CL          ;4 corrimientos a la derecha de AL, para el 1o.digito
+     ADD DL,30h              ;AL convertido a num. en ASCII
+     CMP DL,3Ah              ;verificar si fue letra (A-F)
+     JB  Sig2                ;si no, saltar
+         ADD DL,07h           ;si fue letra, sumar 7 para convert. a ASCII
+   Sig2:
+     WriteChar DL      ;escribir ascii en DL en la posc. del cursor
+     MOV DL,DH         ;recuperar DL
+     SHL DL,CL         ;4 corrimientos de DL a la izq. para primer digito
+     SHR DL,CL         ;4 corrimientos de DL a la derecha a pos. original
+     ADD DL,30h        ;DL convertido a numero en codigo ASCII
+     CMP DL,3Ah             ;verificar si fue letra (A-F)
+     JB  Sig1               ;si no, saltar
+         ADD DL,07h          ;si fue letra, sumar 7 para convert. a ASCII
+   Sig1:
+     WriteChar DL           ;escribir el ascii en DL en la posc. del cursor
+     WriteChar 'h'          ;indicar que son numeros hexadecimales
+ENDM                       ;fin del macro
+
+DOSPrintChar MACRO Char         ;‚ste macro imprime por DOS el caracter en DL
+     MOV DL,Char                 ;poner el caracter pseudopar metro en DL
+     MOV AH,05                   ;funci¢n 05 de impresi¢n de caracteres
+     INT 21h                     ;interrupci¢n 21h
+ENDM                            ;fin del macro
+
+BIOSPrintChar MACRO Char        ;‚ste macro imprime por BIOS el caracter en AL
+      MOV AH,00                   ;servicio de impresi¢n de caracteres
+      MOV AL,Char                 ;en AL el caracter a imprimir
+      MOV DX,00                   ;impresora n£mero 0 (LPT1)
+      INT 17h                     ;int. 17h del BIOS
+ENDM                            ;fin del macro
+
+InicPrinter MACRO                 ;macro para iniciar el puerto de impresi¢n
+      MOV AH,01                     ;servicio de inicializaci¢n del puerto
+      MOV DX,00                     ;impresora n£mero 0 (LPT1)
+      INT 17h                       ;int. 17h del BIOS
+ENDM                              ;fin del macro
+
+PortStatus MACRO Status           ;macro para obtener el status del puerto
+      MOV AH,02                     ;servicio de chequeo del puerto de impresion
+      MOV DX,00                     ;impresora #0 (LPT1)
+      INT 17h                       ;int. 17h del BIOS
+ENDM                              ;fin del macro
+
+SalvaApuntadores MACRO
+       MOV  AH,Xcurs
+       MOV  AL,Ycurs
+       MOV  CursX,AH
+       MOV  CursY,AL
+       MOV  BX,CursorPtr
+       MOV  AuxPtr1,BX
+       MOV  BX,IniPagOffset
+       MOV  AuxPtr2,BX
+       MOV  BX,IniLineaOffs
+       MOV  AuxPtr3,BX
+       MOV  BX,PoscEnTexto
+       MOV  AuxPtr4,BX
+       MOV  AX,IniPagOffset
+       MOV  PoscEnTexto,AX
+ENDM
+
+RestauraApuntadores MACRO
+       MOV  ArchVacio,00
+       MOV  BX,AuxPtr1
+       MOV  CursorPtr,BX
+       MOV  BX,AuxPtr2
+       MOV  IniPagOffset,BX
+       MOV  BX,AuxPtr3
+       MOV  IniLineaOffs,BX
+       MOV  BX,AuxPtr4
+       MOV  PoscEnTexto,BX
+       MOV  AH,CursX
+       MOV  AL,CursY
+       MOV  Xcurs,AH
+       MOV  Ycurs,AL
+       MOV  PtrFijado,00
+       MOV  Modificado,01
+ENDM
+
+;------------------------* FIN DE LA LIBRERIA *-------------------------------
+
