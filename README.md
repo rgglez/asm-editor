@@ -6,7 +6,7 @@ This was intended to run in DOS and to be assembled with [Microsoft Macro Assemb
 
 ## License
 
-Copyright 1994 Rodolfo González González.
+Copyright (c) 1994, Rodolfo González González.
 
 [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
 
