@@ -1,5 +1,6 @@
 # ASM Editor
 
+[![CC BY-NC-ND 4.0][cc-by-nc-nd-shield]][cc-by-nc-nd]
 ![GitHub all releases](https://img.shields.io/github/downloads/rgglez/asm-editor/total) 
 ![GitHub issues](https://img.shields.io/github/issues/rgglez/asm-editor) 
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/y/rgglez/asm-editor)
@@ -11,8 +12,6 @@ This was intended to run in DOS and to be assembled with [Microsoft Macro Assemb
 ## License
 
 Copyright 1994 Rodolfo González González.
-
-Shield: [![CC BY-NC-ND 4.0][cc-by-nc-nd-shield]][cc-by-nc-nd]
 
 This work is licensed under a
 [Creative Commons Attribution-NonCommercial-NoDerivs 4.0 International License][cc-by-nc-nd].
