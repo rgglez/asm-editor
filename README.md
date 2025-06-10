@@ -1,6 +1,5 @@
 # ASM Editor
 
-[![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
 ![GitHub all releases](https://img.shields.io/github/downloads/rgglez/asm-editor/total) 
 ![GitHub issues](https://img.shields.io/github/issues/rgglez/asm-editor) 
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/y/rgglez/asm-editor)
