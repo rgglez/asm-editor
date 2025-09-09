@@ -1,4 +1,4 @@
-# ASM Editor
+# asm-editor
 
 [![CC BY-NC-ND 4.0][cc-by-nc-nd-shield]][cc-by-nc-nd]
 ![GitHub all releases](https://img.shields.io/github/downloads/rgglez/asm-editor/total) 
@@ -25,4 +25,5 @@ This work is licensed under a
 [cc-by-nc-nd-shield]: https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey.svg
 
 Read the [LICENSE](LICENSE.txt) file.
+
 
