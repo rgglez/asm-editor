@@ -4,6 +4,8 @@
 ![GitHub all releases](https://img.shields.io/github/downloads/rgglez/asm-editor/total) 
 ![GitHub issues](https://img.shields.io/github/issues/rgglez/asm-editor) 
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/y/rgglez/asm-editor)
+![GitHub stars](https://img.shields.io/github/stars/rgglez/asm-editor?style=social)
+![GitHub forks](https://img.shields.io/github/forks/rgglez/asm-editor?style=social)
 
 A visual text editor (similar to nano) made in 8088 assembly for the final project of my assembly course (1993) at the Faculty of Physical Mathematical Sciences.
 
@@ -23,3 +25,4 @@ This work is licensed under a
 [cc-by-nc-nd-shield]: https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey.svg
 
 Read the [LICENSE](LICENSE.txt) file.
+
